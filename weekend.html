@@ -18,7 +18,6 @@ body {
   position: relative;
 }
 
-/* ====== 可爱漂浮装饰 ====== */
 .float-deco {
   position: fixed;
   pointer-events: none;
@@ -77,14 +76,8 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.back-btn:hover {
-  background: white;
-  transform: scale(1.05);
-}
-
-.back-btn:active {
-  transform: scale(0.95);
-}
+.back-btn:hover { background: white; transform: scale(1.05); }
+.back-btn:active { transform: scale(0.95); }
 
 .page-title {
   font-size: 20px;
@@ -106,14 +99,14 @@ body {
 
 .wheel-container {
   position: relative;
-  width: 320px;
-  height: 320px;
+  width: 360px;
+  height: 360px;
   margin: 20px auto;
 }
 
 canvas {
-  width: 320px;
-  height: 320px;
+  width: 360px;
+  height: 360px;
   border-radius: 50%;
   box-shadow: 0 8px 40px rgba(0,0,0,0.1);
 }
@@ -164,39 +157,135 @@ canvas {
   letter-spacing: 3px;
 }
 
-.spin-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(91,140,184,0.4);
+.spin-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(91,140,184,0.4); }
+.spin-btn:active { transform: scale(0.95); }
+.spin-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ====== 游戏选择弹窗 ====== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.25s ease-out;
 }
 
-.spin-btn:active {
-  transform: scale(0.95);
+.modal-overlay.show { display: flex; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.spin-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
+.game-picker {
+  background: white;
+  border-radius: 28px;
+  padding: 32px 28px 28px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+  animation: popIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-
-
-
-
-
-
-
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); opacity: 1; }
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
-/* 结果烟花 */
-
-
-
-  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
+.game-picker h2 {
+  font-size: 20px;
+  color: #4A7BA7;
+  margin-bottom: 4px;
 }
 
+.game-picker .hint {
+  font-size: 13px;
+  color: #A0A0A0;
+  margin-bottom: 20px;
+}
+
+.game-display {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #F0F8FF, #E8F0FF);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+
+.game-display.rolling-g {
+  animation: shake 0.12s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.game-emoji {
+  font-size: 56px;
+  line-height: 1;
+}
+
+.game-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #4A4A4A;
+}
+
+.game-countdown {
+  font-size: 40px;
+  font-weight: 800;
+  color: #FF8E53;
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.game-pick-btn {
+  padding: 12px 40px;
+  font-size: 17px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #5B8CB8, #7DB8E8);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(91,140,184,0.3);
+  letter-spacing: 2px;
+}
+
+.game-pick-btn:hover { transform: scale(1.04); }
+.game-pick-btn:active { transform: scale(0.95); }
+.game-pick-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.game-close-btn {
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: #B0B0B0;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px 16px;
+  transition: color 0.2s;
+}
+
+.game-close-btn:hover { color: #888; }
+
+/* ====== 编辑区域 ====== */
 .edit-section {
   margin-top: 28px;
   width: 100%;
@@ -206,21 +295,30 @@ canvas {
   box-shadow: 0 4px 16px rgba(0,0,0,0.06);
 }
 
-.edit-section h3 {
+.game-edit-section {
+  margin-top: 16px;
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.edit-section h3, .game-edit-section h3 {
   font-size: 15px;
   color: #888;
   margin-bottom: 12px;
   letter-spacing: 2px;
 }
 
-.item-list {
+.item-list, .game-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
 }
 
-.item-tag {
+.item-tag, .game-tag {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -231,7 +329,9 @@ canvas {
   color: #4A7BA7;
 }
 
-.item-tag button {
+.game-tag { background: #FFF0F0; color: #D48460; }
+
+.item-tag button, .game-tag button {
   background: none;
   border: none;
   color: #C0C0C0;
@@ -242,9 +342,7 @@ canvas {
   transition: color 0.2s;
 }
 
-.item-tag button:hover {
-  color: #FF6B6B;
-}
+.item-tag button:hover, .game-tag button:hover { color: #FF6B6B; }
 
 .add-row {
   display: flex;
@@ -261,9 +359,7 @@ canvas {
   transition: border-color 0.2s;
 }
 
-.add-row input:focus {
-  border-color: #5B8CB8;
-}
+.add-row input:focus { border-color: #5B8CB8; }
 
 .add-row button {
   padding: 10px 18px;
@@ -277,9 +373,11 @@ canvas {
   transition: all 0.2s;
 }
 
-.add-row button:hover {
-  opacity: 0.9;
+.game-edit-section .add-row button {
+  background: linear-gradient(135deg, #FF8E53, #FF6B6B);
 }
+
+.add-row button:hover { opacity: 0.9; }
 
 .footer-hint {
   margin-top: 12px;
@@ -287,6 +385,8 @@ canvas {
   color: #A0B8D0;
   letter-spacing: 1px;
 }
+
+.game-edit-section .footer-hint { color: #C0A090; }
 </style>
 </head>
 <body>
@@ -307,6 +407,7 @@ canvas {
 
   <button class="spin-btn" id="spinBtn" onclick="spin()">✨ 转动转盘 ✨</button>
 
+  <!-- 转盘内容编辑 -->
   <div class="edit-section">
     <h3>⚙️ 自定义转盘内容</h3>
     <div class="item-list" id="itemList"></div>
@@ -316,15 +417,38 @@ canvas {
     </div>
     <p class="footer-hint">最少 2 项，最多 12 项</p>
   </div>
+
+  <!-- Steam 游戏库编辑 -->
+  <div class="game-edit-section">
+    <h3>🎮 Steam 游戏库（抽到游戏时从这里选）</h3>
+    <div class="game-list" id="gameList"></div>
+    <div class="add-row">
+      <input type="text" id="newGameInput" placeholder="输入游戏名…" maxlength="24">
+      <button onclick="addGame()">＋ 添加</button>
+    </div>
+    <p class="footer-hint">添加你的 Steam 游戏，抽到"打游戏"时随机挑选</p>
+  </div>
+</div>
+
+<!-- 游戏选择弹窗 -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="game-picker">
+    <h2>🎮 今天玩什么？</h2>
+    <p class="hint">从你的 Steam 库里挑一个</p>
+    <div class="game-display" id="gameDisplay">
+      <span class="game-emoji" id="gameEmoji">🎲</span>
+      <span class="game-name" id="gameName">点击下方按钮</span>
+    </div>
+    <button class="game-pick-btn" id="gamePickBtn" onclick="gamePick()">🎲 随机挑一款</button>
+    <br>
+    <button class="game-close-btn" onclick="closeGameModal()">先不玩了，关掉</button>
+  </div>
 </div>
 
 <script>
 // ====== 漂浮装饰 ======
 (function createDecorations() {
-  const decos = [
-    "⭐","🌟","💫","✨","☁️","🌈","💖","🌸","🎀","🦋","🍀","💎",
-    "🌙","☀️","🐱","🐶","🐰","🐻","🎈","🎵","🍭","🧸"
-  ];
+  const decos = ["⭐","🌟","💫","✨","☁️","🌈","💖","🌸","🎀","🦋","🍀","💎","🌙","☀️","🐱","🐶","🐰","🐻","🎈","🎵","🍭","🧸"];
   for (let i = 0; i < 18; i++) {
     const el = document.createElement("span");
     el.className = "float-deco";
@@ -341,9 +465,9 @@ canvas {
 })();
 
 const DEFAULT_ITEMS = ["看电影 🎬", "逛街 🛍️", "宅家休息 🏠", "做运动 🏃", "读本书 📖", "约饭局 🍲", "郊游踏青 🌿", "打游戏 🎮"];
+const GAME_EMOJIS = ["🎮","🕹️","🎲","🃏","👾","🎯","🏆","🔫","⚔️","🧩"];
 
 let items = [];
-let currentRotation = 0;
 let isSpinning = false;
 let wheelAngle = 0;
 
@@ -353,14 +477,10 @@ const COLORS = [
   "#D4F0F0", "#FFCCBC", "#E8D1F0", "#FFF9C4"
 ];
 
+// ====== 转盘 ======
 function loadItems() {
   const saved = localStorage.getItem("weekend_wheel_items");
-  if (saved) {
-    try { items = JSON.parse(saved); } catch(e) { items = [...DEFAULT_ITEMS]; }
-  } else {
-    items = [...DEFAULT_ITEMS];
-  }
-  if (items.length < 2) items = [...DEFAULT_ITEMS];
+  items = saved ? (() => { try { const p = JSON.parse(saved); return p.length >= 2 ? p : [...DEFAULT_ITEMS]; } catch(e) { return [...DEFAULT_ITEMS]; } })() : [...DEFAULT_ITEMS];
 }
 
 function saveItems() {
@@ -368,8 +488,7 @@ function saveItems() {
 }
 
 function renderTagList() {
-  const list = document.getElementById("itemList");
-  list.innerHTML = items.map((item, i) =>
+  document.getElementById("itemList").innerHTML = items.map((item, i) =>
     '<span class="item-tag">' + item +
     (items.length > 2 ? ' <button onclick="removeItem(' + i + ')">×</button>' : '') +
     '</span>'
@@ -414,7 +533,6 @@ function drawWheel() {
   for (let i = 0; i < count; i++) {
     const startAngle = i * arc + wheelAngle;
     const endAngle = startAngle + arc;
-
     ctx.beginPath();
     ctx.moveTo(cx, cy);
     ctx.arc(cx, cy, radius, startAngle, endAngle);
@@ -458,10 +576,6 @@ function spin() {
   const arc = (2 * Math.PI) / count;
   const targetIndex = Math.floor(Math.random() * count);
 
-  // 指针在顶部即 -pi/2 (12点钟方向)
-  // segment i 中点世界角度 = i*arc + wheelAngle + arc/2
-  // 需要: targetIndex*arc + wheelAngle_final + arc/2 = -pi/2 (mod 2pi)
-  // 即: wheelAngle_final = -pi/2 - targetIndex*arc - arc/2 (mod 2pi)
   const baseAngle = ((wheelAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
   const targetWheelAngle = (((-Math.PI / 2 - targetIndex * arc - arc / 2) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
   var offset = ((targetWheelAngle - baseAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
@@ -486,19 +600,155 @@ function spin() {
       drawWheel();
       isSpinning = false;
       document.getElementById("spinBtn").disabled = false;
+
+      // 抽到"游戏" → 弹出游戏选择器
+      const result = items[targetIndex];
+      if (result.includes("游戏") && gameLibrary.length > 0) {
+        setTimeout(function() { openGameModal(); }, 600);
+      }
     }
   }
 
   requestAnimationFrame(animate);
 }
 
+// ====== Steam 游戏库 ======
+let gameLibrary = [];
 
+function loadGames() {
+  const saved = localStorage.getItem("steam_game_library");
+  gameLibrary = saved ? (() => { try { const p = JSON.parse(saved); return p.length >= 1 ? p : []; } catch(e) { return []; } })() : [];
+}
+
+function saveGames() {
+  localStorage.setItem("steam_game_library", JSON.stringify(gameLibrary));
+}
+
+function renderGameTags() {
+  document.getElementById("gameList").innerHTML = gameLibrary.map((g, i) =>
+    '<span class="game-tag">🎮 ' + g + ' <button onclick="removeGame(' + i + ')">×</button></span>'
+  ).join("") || '<span style="font-size:13px;color:#C0A090;">还没有添加游戏，快把你的 Steam 游戏加进来吧～</span>';
+}
+
+function addGame() {
+  const input = document.getElementById("newGameInput");
+  const val = input.value.trim();
+  if (!val) return;
+  if (gameLibrary.length >= 50) { alert("最多 50 款游戏哦～"); return; }
+  gameLibrary.push(val);
+  saveGames();
+  input.value = "";
+  renderGameTags();
+}
+
+function removeGame(index) {
+  gameLibrary.splice(index, 1);
+  saveGames();
+  renderGameTags();
+}
+
+document.getElementById("newGameInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") addGame();
+});
+
+// ====== 游戏选择弹窗 ======
+let gameIsPicking = false;
+
+function openGameModal() {
+  document.getElementById("modalOverlay").classList.add("show");
+  document.getElementById("gameDisplay").classList.remove("rolling-g");
+  document.getElementById("gameEmoji").textContent = "🎲";
+  document.getElementById("gameName").textContent = "点击下方按钮";
+  document.getElementById("gameName").className = "game-name";
+  document.getElementById("gamePickBtn").disabled = false;
+  gameIsPicking = false;
+}
+
+function closeGameModal() {
+  document.getElementById("modalOverlay").classList.remove("show");
+}
+
+document.getElementById("modalOverlay").addEventListener("click", function(e) {
+  if (e.target === this) closeGameModal();
+});
+
+function gamePick() {
+  if (gameIsPicking) return;
+  if (gameLibrary.length === 0) return;
+  gameIsPicking = true;
+
+  const pickBtn = document.getElementById("gamePickBtn");
+  const display = document.getElementById("gameDisplay");
+  const emojiEl = document.getElementById("gameEmoji");
+  const nameEl = document.getElementById("gameName");
+
+  pickBtn.disabled = true;
+  display.classList.add("rolling-g");
+  nameEl.className = "game-name";
+
+  // 阶段1: 快速滚动 2 秒
+  let rollCount = 0;
+  const maxRoll = 2000 / 60;
+
+  var rollInterval = setInterval(function() {
+    const g = gameLibrary[Math.floor(Math.random() * gameLibrary.length)];
+    emojiEl.textContent = GAME_EMOJIS[Math.floor(Math.random() * GAME_EMOJIS.length)];
+    nameEl.textContent = g;
+    rollCount++;
+    if (rollCount >= maxRoll) {
+      clearInterval(rollInterval);
+      startGameCountdown();
+    }
+  }, 60);
+}
+
+function startGameCountdown() {
+  const display = document.getElementById("gameDisplay");
+  const emojiEl = document.getElementById("gameEmoji");
+  const nameEl = document.getElementById("gameName");
+  display.classList.remove("rolling-g");
+
+  var count = 3;
+  nameEl.textContent = count;
+  nameEl.className = "game-countdown";
+
+  var rollInterval = setInterval(function() {
+    const g = gameLibrary[Math.floor(Math.random() * gameLibrary.length)];
+    emojiEl.textContent = GAME_EMOJIS[Math.floor(Math.random() * GAME_EMOJIS.length)];
+    nameEl.textContent = count;
+  }, 180);
+
+  var cdInterval = setInterval(function() {
+    count--;
+    if (count > 0) {
+      nameEl.textContent = count;
+    } else {
+      clearInterval(cdInterval);
+      clearInterval(rollInterval);
+      revealGame();
+    }
+  }, 1000);
+}
+
+function revealGame() {
+  const pickBtn = document.getElementById("gamePickBtn");
+  const emojiEl = document.getElementById("gameEmoji");
+  const nameEl = document.getElementById("gameName");
+  const final = gameLibrary[Math.floor(Math.random() * gameLibrary.length)];
+  emojiEl.textContent = GAME_EMOJIS[Math.floor(Math.random() * GAME_EMOJIS.length)];
+  nameEl.textContent = final;
+  nameEl.className = "game-name";
+  pickBtn.disabled = false;
+  gameIsPicking = false;
+}
+
+// ====== 初始化 ======
 loadItems();
+loadGames();
 renderTagList();
+renderGameTags();
 drawWheel();
 </script>
 
 </body>
 </html>
-
-
