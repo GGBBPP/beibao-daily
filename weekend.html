@@ -486,8 +486,8 @@ canvas {
     <h3>🎮 Steam 游戏库（抽到游戏时从这里选）</h3>
     <div class="steam-config">
       <div class="steam-row">
-        <input type="text" id="steamIdInput" placeholder="Steam ID (17位数字)">
-        <input type="text" id="steamKeyInput" placeholder="Steam Web API Key">
+        <input type="text" id="steamIdInput" placeholder="Steam ID (17位数字)" value="76561198264403185">
+        <input type="text" id="steamKeyInput" placeholder="Steam Web API Key" value="ABAADDACCCE7DCC756A7CCB2E7EE586A">
       </div>
       <button class="steam-sync-btn" id="steamSyncBtn" onclick="syncSteamGames()">🔄 同步 Steam 游戏库</button>
       <p class="steam-hint">
@@ -722,7 +722,7 @@ async function syncSteamGames() {
   status.className = "steam-status loading";
 
   const apiUrl = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=" + steamKey + "&steamid=" + steamId + "&include_appinfo=true&format=json";
-  const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(apiUrl);
+  const proxyUrl = "https://corsproxy.io/?url=" + encodeURIComponent(apiUrl);
 
   try {
     const resp = await fetch(proxyUrl);
@@ -883,4 +883,5 @@ drawWheel();
 
 </body>
 </html>
+
 
