@@ -179,50 +179,21 @@ canvas {
   transform: none;
 }
 
-.result-box {
-  margin-top: 24px;
-  padding: 16px 32px;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-  text-align: center;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.4s;
-  min-width: 220px;
-}
 
-.result-text {
-  font-size: 22px;
-  font-weight: 700;
-  color: #FF6B6B;
-  animation: bounceIn 0.5s ease-out;
-}
 
-.result-placeholder {
-  font-size: 15px;
-  color: #B0B0B0;
-}
 
-@keyframes bounceIn {
-  0% { transform: scale(0.3); opacity: 0; }
+
+
+
+
   50% { transform: scale(1.1); }
   100% { transform: scale(1); opacity: 1; }
 }
 
 /* 结果烟花 */
-.confetti-w {
-  position: fixed;
-  font-size: 22px;
-  pointer-events: none;
-  z-index: 100;
-  animation: confettiFall 1.5s ease-out forwards;
-}
 
-@keyframes confettiFall {
-  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+
+
   100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
 }
 
@@ -330,15 +301,11 @@ canvas {
 <div class="container">
   <div class="wheel-container">
     <div class="pointer"></div>
-    <canvas id="wheelCanvas" width="640" height="640"></canvas>
+    <canvas id="wheelCanvas" width="760" height="760"></canvas>
     <div class="center-dot">🎯</div>
   </div>
 
   <button class="spin-btn" id="spinBtn" onclick="spin()">✨ 转动转盘 ✨</button>
-
-  <div class="result-box" id="resultBox">
-    <span class="result-placeholder" id="resultText">点击按钮，看看周末干什么吧～</span>
-  </div>
 
   <div class="edit-section">
     <h3>⚙️ 自定义转盘内容</h3>
@@ -486,8 +453,6 @@ function spin() {
 
   isSpinning = true;
   document.getElementById("spinBtn").disabled = true;
-  document.getElementById("resultText").textContent = "转动中…";
-  document.getElementById("resultText").className = "result-placeholder";
 
   const count = items.length;
   const arc = (2 * Math.PI) / count;
@@ -521,37 +486,12 @@ function spin() {
       drawWheel();
       isSpinning = false;
       document.getElementById("spinBtn").disabled = false;
-      const result = items[targetIndex];
-      const resultEl = document.getElementById("resultText");
-      resultEl.textContent = "🎉 " + result + " 🎉";
-      resultEl.className = "result-text";
-      spawnConfetti();
     }
   }
 
   requestAnimationFrame(animate);
 }
 
-function spawnConfetti() {
-  const emojis = ["🎉","✨","🌟","💫","🎊","🎀","💖","🌸","⭐"];
-  const box = document.getElementById("resultBox");
-  const rect = box.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top;
-
-  for (let i = 0; i < 10; i++) {
-    const el = document.createElement("span");
-    el.className = "confetti-w";
-    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    el.style.left = cx + "px";
-    el.style.top = cy + "px";
-    el.style.setProperty("--dx", (Math.random() - 0.5) * 280 + "px");
-    el.style.setProperty("--dy", (Math.random() * 180 + 40) + "px");
-    el.style.animationDelay = Math.random() * 0.4 + "s";
-    document.body.appendChild(el);
-    setTimeout(function() { el.remove(); }, 2000);
-  }
-}
 
 loadItems();
 renderTagList();
@@ -560,4 +500,5 @@ drawWheel();
 
 </body>
 </html>
+
 
