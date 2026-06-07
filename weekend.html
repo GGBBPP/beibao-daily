@@ -1,0 +1,457 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>周末干什么 - 贝宝日常</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #E8F4FD 0%, #D4E8F9 50%, #C5DFF0 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+.top-bar {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.8);
+  border: none;
+  color: #5B8CB8;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.back-btn:hover {
+  background: white;
+  transform: scale(1.05);
+}
+
+.back-btn:active {
+  transform: scale(0.95);
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #4A7BA7;
+  letter-spacing: 2px;
+}
+
+.container {
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 24px 60px;
+}
+
+.wheel-container {
+  position: relative;
+  width: 320px;
+  height: 320px;
+  margin: 20px auto;
+}
+
+canvas {
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.1);
+}
+
+.pointer {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-top: 32px solid #FF6B6B;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+  z-index: 5;
+}
+
+.center-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+
+.spin-btn {
+  margin-top: 28px;
+  padding: 16px 60px;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #5B8CB8, #7DB8E8);
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 24px rgba(91,140,184,0.3);
+  letter-spacing: 3px;
+}
+
+.spin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(91,140,184,0.4);
+}
+
+.spin-btn:active {
+  transform: scale(0.95);
+}
+
+.spin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.result-box {
+  margin-top: 24px;
+  padding: 16px 32px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  text-align: center;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.4s;
+}
+
+.result-text {
+  font-size: 22px;
+  font-weight: 700;
+  color: #FF6B6B;
+}
+
+.result-placeholder {
+  font-size: 15px;
+  color: #B0B0B0;
+}
+
+.edit-section {
+  margin-top: 28px;
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.edit-section h3 {
+  font-size: 15px;
+  color: #888;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+}
+
+.item-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.item-tag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #F0F8FF;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 14px;
+  color: #4A7BA7;
+}
+
+.item-tag button {
+  background: none;
+  border: none;
+  color: #C0C0C0;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.2s;
+}
+
+.item-tag button:hover {
+  color: #FF6B6B;
+}
+
+.add-row {
+  display: flex;
+  gap: 8px;
+}
+
+.add-row input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid #E8F0F8;
+  border-radius: 16px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.add-row input:focus {
+  border-color: #5B8CB8;
+}
+
+.add-row button {
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #5B8CB8, #7DB8E8);
+  color: white;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.add-row button:hover {
+  opacity: 0.9;
+}
+
+.footer-hint {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #A0B8D0;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    <span>←</span> 返回
+  </button>
+  <span class="page-title">🎡 周末干什么</span>
+</div>
+
+<div class="container">
+  <div class="wheel-container">
+    <div class="pointer"></div>
+    <canvas id="wheelCanvas" width="640" height="640"></canvas>
+    <div class="center-dot">🎯</div>
+  </div>
+
+  <button class="spin-btn" id="spinBtn" onclick="spin()">✨ 转动转盘 ✨</button>
+
+  <div class="result-box" id="resultBox">
+    <span class="result-placeholder" id="resultText">点击按钮，看看周末干什么吧～</span>
+  </div>
+
+  <div class="edit-section">
+    <h3>⚙️ 自定义转盘内容</h3>
+    <div class="item-list" id="itemList"></div>
+    <div class="add-row">
+      <input type="text" id="newItemInput" placeholder="输入新选项…" maxlength="10">
+      <button onclick="addItem()">＋ 添加</button>
+    </div>
+    <p class="footer-hint">最少 2 项，最多 12 项</p>
+  </div>
+</div>
+
+<script>
+const DEFAULT_ITEMS = ["看电影 🎬", "逛街 🛍️", "宅家休息 🏠", "做运动 🏃", "读本书 📖", "约饭局 🍲", "郊游踏青 🌿", "打游戏 🎮"];
+
+let items = [];
+let currentRotation = 0;
+let isSpinning = false;
+let wheelAngle = 0;
+
+const COLORS = [
+  "#FF9AA2", "#FFB7B2", "#FFDAC1", "#E2F0CB",
+  "#B5EAD7", "#C7CEEA", "#F0E6EF", "#FFE0B2",
+  "#D4F0F0", "#FFCCBC", "#E8D1F0", "#FFF9C4"
+];
+
+function loadItems() {
+  const saved = localStorage.getItem("weekend_wheel_items");
+  if (saved) {
+    try { items = JSON.parse(saved); } catch(e) { items = [...DEFAULT_ITEMS]; }
+  } else {
+    items = [...DEFAULT_ITEMS];
+  }
+  if (items.length < 2) items = [...DEFAULT_ITEMS];
+}
+
+function saveItems() {
+  localStorage.setItem("weekend_wheel_items", JSON.stringify(items));
+}
+
+function renderTagList() {
+  const list = document.getElementById("itemList");
+  list.innerHTML = items.map((item, i) =>
+    '<span class="item-tag">' + item +
+    (items.length > 2 ? ' <button onclick="removeItem(' + i + ')">×</button>' : '') +
+    '</span>'
+  ).join("");
+}
+
+function addItem() {
+  const input = document.getElementById("newItemInput");
+  const val = input.value.trim();
+  if (!val) return;
+  if (items.length >= 12) { alert("最多 12 项哦～"); return; }
+  items.push(val);
+  saveItems();
+  input.value = "";
+  renderTagList();
+  drawWheel();
+}
+
+function removeItem(index) {
+  if (items.length <= 2) return;
+  items.splice(index, 1);
+  saveItems();
+  renderTagList();
+  drawWheel();
+}
+
+document.getElementById("newItemInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") addItem();
+});
+
+function drawWheel() {
+  const canvas = document.getElementById("wheelCanvas");
+  const ctx = canvas.getContext("2d");
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  const radius = cx - 8;
+  const count = items.length;
+  const arc = (2 * Math.PI) / count;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < count; i++) {
+    const startAngle = i * arc + wheelAngle;
+    const endAngle = startAngle + arc;
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = COLORS[i % COLORS.length];
+    ctx.fill();
+    ctx.strokeStyle = "rgba(255,255,255,0.6)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(startAngle + arc / 2);
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#4A4A4A";
+    ctx.font = "bold 20px 'PingFang SC','Microsoft YaHei',sans-serif";
+    ctx.fillText(items[i], radius * 0.6, 8);
+    ctx.restore();
+  }
+
+  const dotGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 24);
+  dotGrad.addColorStop(0, "white");
+  dotGrad.addColorStop(1, "#EEE");
+  ctx.beginPath();
+  ctx.arc(cx, cy, 24, 0, 2 * Math.PI);
+  ctx.fillStyle = dotGrad;
+  ctx.fill();
+  ctx.strokeStyle = "#DDD";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function spin() {
+  if (isSpinning) return;
+  if (items.length < 2) return;
+
+  isSpinning = true;
+  document.getElementById("spinBtn").disabled = true;
+  document.getElementById("resultText").textContent = "转动中…";
+  document.getElementById("resultText").className = "result-placeholder";
+
+  const count = items.length;
+  const arc = (2 * Math.PI) / count;
+  const targetIndex = Math.floor(Math.random() * count);
+  const targetAngle = targetIndex * arc;
+
+  const baseAngle = wheelAngle % (2 * Math.PI);
+  let extraSpins = (5 + Math.random() * 5) * 2 * Math.PI;
+
+  let pointerAngle = (-Math.PI / 2 - baseAngle + 2 * Math.PI) % (2 * Math.PI);
+  let offsetToTarget = (targetAngle - pointerAngle + 2 * Math.PI) % (2 * Math.PI);
+  let totalRotation = extraSpins + offsetToTarget;
+
+  const startTime = performance.now();
+  const duration = 4000 + Math.random() * 1000;
+
+  function animate(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 4);
+    const angle = totalRotation * eased;
+    wheelAngle = (baseAngle + angle) % (2 * Math.PI);
+    drawWheel();
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      wheelAngle = (baseAngle + totalRotation) % (2 * Math.PI);
+      drawWheel();
+      isSpinning = false;
+      document.getElementById("spinBtn").disabled = false;
+      const result = items[targetIndex];
+      document.getElementById("resultText").textContent = "🎉 " + result + " 🎉";
+      document.getElementById("resultText").className = "result-text";
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+loadItems();
+renderTagList();
+drawWheel();
+</script>
+
+</body>
+</html>

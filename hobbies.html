@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>翻牌子 - 贝宝日常</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #FFF0F0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  box-shadow: 0 2px 12px rgba(255,107,107,0.3);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.25);
+  border: none;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+}
+
+.back-btn:hover {
+  background: rgba(255,255,255,0.4);
+  transform: scale(1.05);
+}
+
+.back-btn:active {
+  transform: scale(0.95);
+}
+
+.top-bar-title {
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.iframe-wrapper {
+  flex: 1;
+  position: relative;
+  background: white;
+}
+
+.iframe-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.fallback {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 24px;
+}
+
+.fallback-emoji {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.fallback-text {
+  font-size: 16px;
+  color: #888;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.fallback-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+  color: white;
+  text-decoration: none;
+  padding: 14px 36px;
+  border-radius: 30px;
+  font-size: 18px;
+  font-weight: 700;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(255,107,107,0.3);
+}
+
+.fallback-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px rgba(255,107,107,0.4);
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="goBack()">
+    <span>←</span> 返回
+  </button>
+  <span class="top-bar-title">🎴 翻牌子</span>
+</div>
+
+<div class="iframe-wrapper" id="iframeWrapper">
+  <iframe
+    id="contentFrame"
+    src="https://ggbbpp.github.io/fanpaizi/"
+    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+    loading="eager">
+  </iframe>
+</div>
+
+<div class="fallback" id="fallback">
+  <span class="fallback-emoji">🎴</span>
+  <p class="fallback-text">翻牌子页面无法嵌入显示</p>
+  <a class="fallback-btn" href="https://ggbbpp.github.io/fanpaizi/" target="_blank" rel="noopener">
+    在新窗口打开 →
+  </a>
+</div>
+
+<script>
+function goBack() {
+  window.location.href = "index.html";
+}
+
+document.getElementById("contentFrame").onerror = function() {
+  document.getElementById("iframeWrapper").style.display = "none";
+  document.getElementById("fallback").style.display = "flex";
+};
+
+setTimeout(function() {
+  try {
+    var iframe = document.getElementById("contentFrame");
+    if (iframe.contentDocument && iframe.contentDocument.body && iframe.contentDocument.body.innerHTML.trim() === "") {
+      // might be blocked
+    }
+  } catch(e) {
+    document.getElementById("iframeWrapper").style.display = "none";
+    document.getElementById("fallback").style.display = "flex";
+  }
+}, 3000);
+</script>
+
+</body>
+</html>

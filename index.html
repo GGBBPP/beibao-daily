@@ -1,0 +1,241 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>贝宝日常</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #FFF5EE 0%, #FFE4E1 30%, #FFF0F5 60%, #F0F8FF 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.cloud {
+  position: fixed;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: floatCloud 20s ease-in-out infinite;
+}
+
+.cloud::before, .cloud::after {
+  content: "";
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cloud1 {
+  width: 120px; height: 50px;
+  top: 8%; left: 10%;
+  animation-delay: 0s;
+}
+.cloud1::before { width: 50px; height: 50px; top: -25px; left: 25px; }
+.cloud1::after { width: 70px; height: 40px; top: -15px; left: 50px; }
+
+.cloud2 {
+  width: 100px; height: 40px;
+  top: 15%; right: 12%;
+  animation-delay: 7s;
+}
+.cloud2::before { width: 40px; height: 40px; top: -20px; left: 20px; }
+.cloud2::after { width: 55px; height: 35px; top: -12px; left: 40px; }
+
+.cloud3 {
+  width: 80px; height: 35px;
+  top: 25%; left: 60%;
+  animation-delay: 14s;
+}
+.cloud3::before { width: 35px; height: 35px; top: -18px; left: 15px; }
+.cloud3::after { width: 45px; height: 30px; top: -10px; left: 35px; }
+
+@keyframes floatCloud {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(30px); }
+  75% { transform: translateX(-30px); }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  padding: 40px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title-wrapper {
+  text-align: center;
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.title {
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FF6B6B, #FF8E53, #FFD93D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 6px;
+}
+
+.title-emoji {
+  font-size: 36px;
+  display: block;
+  margin-bottom: 8px;
+  -webkit-text-fill-color: initial;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: #B0A0A0;
+  margin-top: 8px;
+  letter-spacing: 3px;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 28px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 36px rgba(0,0,0,0.1);
+}
+
+.card:active {
+  transform: scale(0.96);
+}
+
+.card-icon {
+  font-size: 52px;
+  line-height: 1;
+  animation: wiggle 3s ease-in-out infinite;
+}
+
+.card:nth-child(1) .card-icon { animation-delay: 0s; }
+.card:nth-child(2) .card-icon { animation-delay: 0.5s; }
+.card:nth-child(3) .card-icon { animation-delay: 1s; }
+.card:nth-child(4) .card-icon { animation-delay: 1.5s; }
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #4A4A4A;
+}
+
+.card:nth-child(1) { background: linear-gradient(135deg, #FFF0F0, #FFE8E8); }
+.card:nth-child(2) { background: linear-gradient(135deg, #F0F8FF, #E8F0FF); }
+.card:nth-child(3) { background: linear-gradient(135deg, #FFF8F0, #FFF0E0); }
+.card:nth-child(4) { background: linear-gradient(135deg, #F5F0FF, #EDE0FF); }
+
+.card:nth-child(4) {
+  opacity: 0.65;
+  cursor: default;
+}
+.card:nth-child(4):hover {
+  transform: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+.card:nth-child(4):active {
+  transform: none;
+}
+
+.card-coming {
+  font-size: 12px;
+  color: #B0A0C0;
+  margin-top: 2px;
+}
+
+.footer {
+  margin-top: 40px;
+  font-size: 13px;
+  color: #C0B0B0;
+  letter-spacing: 2px;
+}
+</style>
+</head>
+<body>
+
+<div class="cloud cloud1"></div>
+<div class="cloud cloud2"></div>
+<div class="cloud cloud3"></div>
+
+<div class="container">
+  <div class="title-wrapper">
+    <span class="title-emoji">🐚✨</span>
+    <h1 class="title">贝宝日常</h1>
+    <p class="subtitle">— 今日份小确幸 —</p>
+  </div>
+
+  <div class="cards-grid">
+    <a href="hobbies.html" class="card">
+      <span class="card-icon">🎴</span>
+      <span class="card-title">翻牌子</span>
+    </a>
+
+    <a href="weekend.html" class="card">
+      <span class="card-icon">🎡</span>
+      <span class="card-title">周末干什么</span>
+    </a>
+
+    <a href="food.html" class="card">
+      <span class="card-icon">🍽️</span>
+      <span class="card-title">今天吃什么</span>
+    </a>
+
+    <div class="card">
+      <span class="card-icon">🎁</span>
+      <span class="card-title">敬请期待</span>
+      <span class="card-coming">coming soon...</span>
+    </div>
+  </div>
+
+  <p class="footer">✨ 和贝宝一起快乐每一天 ✨</p>
+</div>
+
+</body>
+</html>

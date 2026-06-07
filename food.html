@@ -1,0 +1,374 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今天吃什么 - 贝宝日常</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #FFF5EE 0%, #FFF0E0 50%, #FFECD2 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* 漂浮食物 */
+.floating-food {
+  position: fixed;
+  font-size: 32px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.35;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes float1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(20px, -30px) rotate(10deg); }
+  66% { transform: translate(-15px, -15px) rotate(-8deg); }
+}
+
+@keyframes float2 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-25px, -20px) rotate(-12deg); }
+  66% { transform: translate(10px, -35px) rotate(8deg); }
+}
+
+@keyframes float3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(15px, -40px) rotate(15deg); }
+}
+
+.top-bar {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  position: relative;
+  z-index: 10;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.8);
+  border: none;
+  color: #E89440;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.back-btn:hover {
+  background: white;
+  transform: scale(1.05);
+}
+
+.back-btn:active {
+  transform: scale(0.95);
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #D48430;
+  letter-spacing: 2px;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px 60px;
+}
+
+.display-box {
+  width: 260px;
+  height: 260px;
+  background: white;
+  border-radius: 30px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.display-box.rolling {
+  animation: shake 0.15s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.display-box.done {
+  background: linear-gradient(135deg, #FFF9F0, #FFF3E0);
+}
+
+.food-emoji-display {
+  font-size: 80px;
+  line-height: 1;
+  transition: all 0.15s;
+}
+
+.food-name-display {
+  font-size: 24px;
+  font-weight: 700;
+  color: #4A4A4A;
+}
+
+.placeholder-text {
+  font-size: 16px;
+  color: #C0B0B0;
+}
+
+.countdown {
+  font-size: 48px;
+  font-weight: 800;
+  color: #FF8E53;
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.pick-btn {
+  margin-top: 32px;
+  padding: 16px 60px;
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #FF8E53, #FF6B6B);
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 6px 24px rgba(255,107,107,0.3);
+  letter-spacing: 3px;
+}
+
+.pick-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255,107,107,0.4);
+}
+
+.pick-btn:active {
+  transform: scale(0.95);
+}
+
+.pick-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 结果烟花效果 */
+.confetti {
+  position: fixed;
+  font-size: 24px;
+  pointer-events: none;
+  z-index: 100;
+  animation: confettiFall 1.5s ease-out forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.3);
+  }
+}
+
+.footer-hint {
+  margin-top: 40px;
+  font-size: 13px;
+  color: #D0B090;
+  letter-spacing: 2px;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    <span>←</span> 返回
+  </button>
+  <span class="page-title">🍽️ 今天吃什么</span>
+</div>
+
+<div class="container">
+  <div class="display-box" id="displayBox">
+    <span class="food-emoji-display" id="foodEmoji">🤔</span>
+    <span class="placeholder-text" id="foodName">今天吃什么呢…</span>
+  </div>
+
+  <button class="pick-btn" id="pickBtn" onclick="startPick()">🎲 帮我决定！</button>
+
+  <p class="footer-hint">选择困难症？让贝宝来帮你～</p>
+</div>
+
+<script>
+const FOODS = [
+  { name: "火锅", emoji: "🍲" },
+  { name: "烧烤", emoji: "🍖" },
+  { name: "寿司", emoji: "🍣" },
+  { name: "披萨", emoji: "🍕" },
+  { name: "汉堡", emoji: "🍔" },
+  { name: "麻辣烫", emoji: "🌶️" },
+  { name: "饺子", emoji: "🥟" },
+  { name: "蛋炒饭", emoji: "🍚" },
+  { name: "拉面", emoji: "🍜" },
+  { name: "炸鸡", emoji: "🍗" },
+  { name: "沙拉", emoji: "🥗" },
+  { name: "馄饨", emoji: "🥟" },
+  { name: "麻辣香锅", emoji: "🥘" },
+  { name: "盖浇饭", emoji: "🍛" },
+  { name: "螺蛳粉", emoji: "🍜" },
+  { name: "酸菜鱼", emoji: "🐟" },
+  { name: "黄焖鸡", emoji: "🍗" },
+  { name: "牛肉面", emoji: "🍝" },
+  { name: "煎饼果子", emoji: "🥞" },
+  { name: "煲仔饭", emoji: "🍲" }
+];
+
+let isPicking = false;
+let rollInterval = null;
+
+// 生成漂浮食物
+(function createFloatingFood() {
+  const emojis = ["🍕","🍔","🍟","🌮","🍣","🍜","🍰","🧁","🍩","🍪","🍉","🍇","🥐","🍗","🍝","🥟","🍚","🍛","🍲","🍖","🥗","🧋","🍦","🍿"];
+  for (let i = 0; i < 20; i++) {
+    const el = document.createElement("span");
+    el.className = "floating-food";
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = Math.random() * 100 + "%";
+    el.style.top = Math.random() * 100 + "%";
+    el.style.animationName = ["float1","float2","float3"][i % 3];
+    el.style.animationDuration = (8 + Math.random() * 12) + "s";
+    el.style.animationDelay = Math.random() * 10 + "s";
+    el.style.fontSize = (24 + Math.random() * 28) + "px";
+    document.body.appendChild(el);
+  }
+})();
+
+function startPick() {
+  if (isPicking) return;
+  isPicking = true;
+
+  const pickBtn = document.getElementById("pickBtn");
+  const displayBox = document.getElementById("displayBox");
+  const foodEmoji = document.getElementById("foodEmoji");
+  const foodName = document.getElementById("foodName");
+
+  pickBtn.disabled = true;
+  displayBox.classList.add("rolling");
+  displayBox.classList.remove("done");
+  foodName.className = "placeholder-text";
+
+  const rollSpeed = 60;
+  let rollCount = 0;
+  const rollDuration = 2000;
+
+  rollInterval = setInterval(function() {
+    const r = FOODS[Math.floor(Math.random() * FOODS.length)];
+    foodEmoji.textContent = r.emoji;
+    foodName.textContent = r.name;
+    rollCount++;
+    if (rollCount >= rollDuration / rollSpeed) {
+      clearInterval(rollInterval);
+      startCountdown();
+    }
+  }, rollSpeed);
+}
+
+function startCountdown() {
+  const displayBox = document.getElementById("displayBox");
+  const foodName = document.getElementById("foodName");
+  displayBox.classList.remove("rolling");
+
+  let count = 3;
+  foodName.textContent = count;
+  foodName.className = "countdown";
+
+  const cdInterval = setInterval(function() {
+    count--;
+    if (count > 0) {
+      foodName.textContent = count;
+    } else {
+      clearInterval(cdInterval);
+      revealResult();
+    }
+  }, 1000);
+}
+
+function revealResult() {
+  const pickBtn = document.getElementById("pickBtn");
+  const displayBox = document.getElementById("displayBox");
+  const foodEmoji = document.getElementById("foodEmoji");
+  const foodName = document.getElementById("foodName");
+
+  const final = FOODS[Math.floor(Math.random() * FOODS.length)];
+  foodEmoji.textContent = final.emoji;
+  foodName.textContent = final.name;
+  foodName.className = "food-name-display";
+  displayBox.classList.add("done");
+
+  spawnConfetti();
+  pickBtn.disabled = false;
+  isPicking = false;
+}
+
+function spawnConfetti() {
+  const emojis = ["🎉","✨","🌟","💫","🎊","🎀","💖","🌸"];
+  const box = document.getElementById("displayBox");
+  const rect = box.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top;
+
+  for (let i = 0; i < 12; i++) {
+    const el = document.createElement("span");
+    el.className = "confetti";
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = cx + "px";
+    el.style.top = cy + "px";
+    el.style.setProperty("--dx", (Math.random() - 0.5) * 300 + "px");
+    el.style.setProperty("--dy", (Math.random() * 200 + 50) + "px");
+    el.style.animationDelay = Math.random() * 0.4 + "s";
+    document.body.appendChild(el);
+    setTimeout(function() { el.remove(); }, 2000);
+  }
+}
+</script>
+
+</body>
+</html>
