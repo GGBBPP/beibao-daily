@@ -387,6 +387,69 @@ canvas {
 }
 
 .game-edit-section .footer-hint { color: #C0A090; }
+
+.steam-config {
+  background: #FFF8F5;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.steam-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.steam-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid #F0E0D8;
+  border-radius: 12px;
+  font-size: 13px;
+  outline: none;
+  background: white;
+}
+
+.steam-row input:focus { border-color: #FF8E53; }
+
+.steam-sync-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: white;
+  background: linear-gradient(135deg, #2A475E, #1B2838);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 2px;
+}
+
+.steam-sync-btn:hover { opacity: 0.9; transform: scale(1.02); }
+.steam-sync-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.steam-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.steam-hint a { color: #5B8CB8; text-decoration: none; }
+.steam-hint a:hover { text-decoration: underline; }
+
+.steam-status {
+  margin-top: 6px;
+  font-size: 12px;
+  text-align: center;
+  color: #888;
+  min-height: 16px;
+}
+
+.steam-status.success { color: #4CAF50; }
+.steam-status.error { color: #FF6B6B; }
+.steam-status.loading { color: #FF8E53; }
 </style>
 </head>
 <body>
@@ -421,12 +484,25 @@ canvas {
   <!-- Steam 游戏库编辑 -->
   <div class="game-edit-section">
     <h3>🎮 Steam 游戏库（抽到游戏时从这里选）</h3>
+    <div class="steam-config">
+      <div class="steam-row">
+        <input type="text" id="steamIdInput" placeholder="Steam ID (17位数字)">
+        <input type="text" id="steamKeyInput" placeholder="Steam Web API Key">
+      </div>
+      <button class="steam-sync-btn" id="steamSyncBtn" onclick="syncSteamGames()">🔄 同步 Steam 游戏库</button>
+      <p class="steam-hint">
+        <a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">获取 API Key →</a>
+        &nbsp;|&nbsp;
+        <a href="https://steamid.io/" target="_blank" rel="noopener">查找 Steam ID →</a>
+      </p>
+      <p class="steam-status" id="steamStatus"></p>
+    </div>
     <div class="game-list" id="gameList"></div>
     <div class="add-row">
-      <input type="text" id="newGameInput" placeholder="输入游戏名…" maxlength="24">
+      <input type="text" id="newGameInput" placeholder="手动添加游戏…" maxlength="24">
       <button onclick="addGame()">＋ 添加</button>
     </div>
-    <p class="footer-hint">添加你的 Steam 游戏，抽到"打游戏"时随机挑选</p>
+    <p class="footer-hint">可手动添加或点「同步」从 Steam 自动拉取</p>
   </div>
 </div>
 
@@ -615,6 +691,60 @@ function spin() {
 // ====== Steam 游戏库 ======
 let gameLibrary = [];
 
+// 加载保存的 Steam 配置
+function loadSteamConfig() {
+  const steamId = localStorage.getItem("steam_id") || "";
+  const steamKey = localStorage.getItem("steam_key") || "";
+  document.getElementById("steamIdInput").value = steamId;
+  document.getElementById("steamKeyInput").value = steamKey;
+}
+
+function saveSteamConfig() {
+  localStorage.setItem("steam_id", document.getElementById("steamIdInput").value.trim());
+  localStorage.setItem("steam_key", document.getElementById("steamKeyInput").value.trim());
+}
+
+async function syncSteamGames() {
+  const btn = document.getElementById("steamSyncBtn");
+  const status = document.getElementById("steamStatus");
+  const steamId = document.getElementById("steamIdInput").value.trim();
+  const steamKey = document.getElementById("steamKeyInput").value.trim();
+
+  if (!steamId || !steamKey) {
+    status.textContent = "请填写 Steam ID 和 API Key";
+    status.className = "steam-status error";
+    return;
+  }
+
+  saveSteamConfig();
+  btn.disabled = true;
+  status.textContent = "正在连接 Steam…";
+  status.className = "steam-status loading";
+
+  const apiUrl = "https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key=" + steamKey + "&steamid=" + steamId + "&include_appinfo=true&format=json";
+  const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(apiUrl);
+
+  try {
+    const resp = await fetch(proxyUrl);
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    const data = await resp.json();
+    if (!data.response || !data.response.games) {
+      throw new Error("未找到游戏数据，请确认 Steam ID 正确且资料设为公开");
+    }
+    const games = data.response.games.map(function(g) { return g.name; });
+    gameLibrary = games;
+    saveGames();
+    renderGameTags();
+    status.textContent = "✅ 已同步 " + games.length + " 款游戏";
+    status.className = "steam-status success";
+  } catch(e) {
+    status.textContent = "❌ 同步失败：" + e.message;
+    status.className = "steam-status error";
+  }
+
+  btn.disabled = false;
+}
+
 function loadGames() {
   const saved = localStorage.getItem("steam_game_library");
   gameLibrary = saved ? (() => { try { const p = JSON.parse(saved); return p.length >= 1 ? p : []; } catch(e) { return []; } })() : [];
@@ -745,6 +875,7 @@ function revealGame() {
 // ====== 初始化 ======
 loadItems();
 loadGames();
+loadSteamConfig();
 renderTagList();
 renderGameTags();
 drawWheel();
@@ -752,3 +883,4 @@ drawWheel();
 
 </body>
 </html>
+
