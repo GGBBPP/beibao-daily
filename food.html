@@ -14,17 +14,17 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
 }
 
-/* 漂浮食物 */
 .floating-food {
   position: fixed;
   font-size: 32px;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.35;
+  opacity: 0.3;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
 }
@@ -73,14 +73,8 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.back-btn:hover {
-  background: white;
-  transform: scale(1.05);
-}
-
-.back-btn:active {
-  transform: scale(0.95);
-}
+.back-btn:hover { background: white; transform: scale(1.05); }
+.back-btn:active { transform: scale(0.95); }
 
 .page-title {
   font-size: 20px;
@@ -97,7 +91,41 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 24px 60px;
+  padding: 20px 24px 60px;
+}
+
+/* ====== 三餐标签 ====== */
+.tabs {
+  display: flex;
+  gap: 0;
+  background: white;
+  border-radius: 20px;
+  padding: 4px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  margin-bottom: 32px;
+  width: 100%;
+  max-width: 360px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  border: none;
+  background: transparent;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #B0A090;
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 1px;
+}
+
+.tab.active {
+  background: linear-gradient(135deg, #FFD93D, #FF8E53);
+  color: white;
+  box-shadow: 0 2px 8px rgba(255,142,83,0.3);
 }
 
 .display-box {
@@ -140,6 +168,8 @@ body {
   font-size: 24px;
   font-weight: 700;
   color: #4A4A4A;
+  text-align: center;
+  padding: 0 8px;
 }
 
 .placeholder-text {
@@ -147,7 +177,16 @@ body {
   color: #C0B0B0;
 }
 
-/* 倒计时覆盖层 */
+/* 店铺提示 */
+.shop-hint {
+  font-size: 12px;
+  color: #C0A080;
+  margin-top: 4px;
+  max-width: 200px;
+  text-align: center;
+  line-height: 1.4;
+}
+
 .countdown-overlay {
   display: none;
   position: absolute;
@@ -187,22 +226,11 @@ body {
   letter-spacing: 3px;
 }
 
-.pick-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(255,107,107,0.4);
-}
+.pick-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,107,107,0.4); }
+.pick-btn:active { transform: scale(0.95); }
+.pick-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-.pick-btn:active {
-  transform: scale(0.95);
-}
-
-.pick-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* 结果烟花效果 */
+/* 结果烟花 */
 .confetti {
   position: fixed;
   font-size: 24px;
@@ -212,14 +240,19 @@ body {
 }
 
 @keyframes confettiFall {
-  0% {
-    opacity: 1;
-    transform: translate(0, 0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--dx), var(--dy)) scale(0.3);
-  }
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
+}
+
+.meal-label {
+  font-size: 13px;
+  color: #D48430;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+  background: rgba(255,255,255,0.6);
+  padding: 4px 16px;
+  border-radius: 12px;
 }
 
 .footer-hint {
@@ -240,49 +273,85 @@ body {
 </div>
 
 <div class="container">
+  <!-- 三餐标签 -->
+  <div class="tabs">
+    <button class="tab active" id="tabBreakfast" onclick="switchMeal('breakfast')">🌅 早饭</button>
+    <button class="tab" id="tabLunch" onclick="switchMeal('lunch')">☀️ 午饭</button>
+    <button class="tab" id="tabDinner" onclick="switchMeal('dinner')">🌙 晚饭</button>
+  </div>
+
+  <p class="meal-label" id="mealLabel">— 早饭吃啥 —</p>
+
   <div class="display-box" id="displayBox">
     <span class="food-emoji-display" id="foodEmoji">🤔</span>
-    <span class="placeholder-text" id="foodName">今天吃什么呢…</span>
+    <span class="placeholder-text" id="foodName">点击按钮看看吧～</span>
+    <span class="shop-hint" id="shopHint"></span>
     <div class="countdown-overlay" id="countdownOverlay">3</div>
   </div>
 
   <button class="pick-btn" id="pickBtn" onclick="startPick()">🎲 帮我决定！</button>
 
-  <p class="footer-hint">选择困难症？让贝宝来帮你～</p>
+  <p class="footer-hint">在金昌也能轻松吃到～</p>
 </div>
 
 <script>
-const FOODS = [
-  { name: "火锅", emoji: "🍲" },
-  { name: "烧烤", emoji: "🍖" },
-  { name: "寿司", emoji: "🍣" },
-  { name: "披萨", emoji: "🍕" },
-  { name: "汉堡", emoji: "🍔" },
-  { name: "麻辣烫", emoji: "🌶️" },
-  { name: "饺子", emoji: "🥟" },
-  { name: "蛋炒饭", emoji: "🍚" },
-  { name: "拉面", emoji: "🍜" },
-  { name: "炸鸡", emoji: "🍗" },
-  { name: "沙拉", emoji: "🥗" },
-  { name: "馄饨", emoji: "🥟" },
-  { name: "麻辣香锅", emoji: "🥘" },
-  { name: "盖浇饭", emoji: "🍛" },
-  { name: "螺蛳粉", emoji: "🍜" },
-  { name: "酸菜鱼", emoji: "🐟" },
-  { name: "黄焖鸡", emoji: "🍗" },
-  { name: "牛肉面", emoji: "🍝" },
-  { name: "煎饼果子", emoji: "🥞" },
-  { name: "煲仔饭", emoji: "🍲" }
-];
+var currentMeal = "breakfast";
 
-let isPicking = false;
-let rollInterval = null;
+// ====== 金昌本地美食 ======
+// 格式: { name, emoji, shop: "推荐去处" }
+var FOODS = {
+  breakfast: [
+    { name: "牛肉面（毛细）", emoji: "🍜", shop: "各牛肉面馆 · 面条细如发丝" },
+    { name: "牛肉面（二细）", emoji: "🍜", shop: "各牛肉面馆 · 经典口感首选" },
+    { name: "牛肉面（韭叶）", emoji: "🍜", shop: "各牛肉面馆 · 扁平适口" },
+    { name: "牛肉面（大宽）", emoji: "🍜", shop: "各牛肉面馆 · 皮带面口感" },
+    { name: "豆浆 + 油条", emoji: "🥛", shop: "各早餐摊 · 随处可见" },
+    { name: "豆腐脑", emoji: "🥣", shop: "各早餐摊位" },
+    { name: "羊肉泡馍", emoji: "🥘", shop: "羊肉泡馍馆 · 金川区多家" },
+    { name: "臊子面", emoji: "🍝", shop: "各面馆均有" },
+    { name: "灰豆面", emoji: "🫘", shop: "本地小吃店" },
+    { name: "包子（牛肉馅）", emoji: "🥟", shop: "各包子铺" },
+    { name: "鸡蛋灌饼", emoji: "🥞", shop: "街边早餐车" },
+    { name: "小米粥 + 小菜", emoji: "🥣", shop: "各早餐店" }
+  ],
+  lunch: [
+    { name: "炒面片", emoji: "🍝", shop: "各面馆 · 金昌家常味" },
+    { name: "干拌面", emoji: "🍜", shop: "各面馆均有售" },
+    { name: "油泼面", emoji: "🍝", shop: "陕西面馆 · 金川区多家" },
+    { name: "搓鱼子", emoji: "🐟", shop: "本地特色面馆" },
+    { name: "炒拉条", emoji: "🍜", shop: "各清真面馆" },
+    { name: "凉皮 + 肉夹馍", emoji: "🥙", shop: "凉皮店 · 各大市场旁" },
+    { name: "麻辣粉", emoji: "🌶️", shop: "各麻辣烫/粉店" },
+    { name: "盖浇饭（宫保鸡丁）", emoji: "🍛", shop: "各快餐小炒店" },
+    { name: "盖浇饭（鱼香肉丝）", emoji: "🍛", shop: "各快餐小炒店" },
+    { name: "盖浇饭（土豆烧牛肉）", emoji: "🍛", shop: "各快餐小炒店" },
+    { name: "羊肉泡馍", emoji: "🥘", shop: "羊肉泡馍馆" },
+    { name: "炒拨拉", emoji: "🥘", shop: "河西特色 · 部分餐馆有" },
+    { name: "酸汤面", emoji: "🍜", shop: "各面馆" }
+  ],
+  dinner: [
+    { name: "羊肉垫卷子", emoji: "🥘", shop: "金昌招牌菜 · 多家餐馆" },
+    { name: "手抓羊肉", emoji: "🍖", shop: "清真餐馆" },
+    { name: "黄焖羊肉", emoji: "🍖", shop: "各中餐馆" },
+    { name: "暖锅（甘肃火锅）", emoji: "🍲", shop: "暖锅店 · 金川区有" },
+    { name: "大盘鸡", emoji: "🥘", shop: "新疆风味餐馆" },
+    { name: "烧烤（羊肉串）", emoji: "🍢", shop: "各烧烤摊 · 夜市" },
+    { name: "火锅", emoji: "🍲", shop: "各火锅店" },
+    { name: "烤羊排", emoji: "🍖", shop: "清真烧烤店" },
+    { name: "干锅", emoji: "🥘", shop: "干锅店" },
+    { name: "炒菜米饭（酸辣土豆丝+回锅肉）", emoji: "🥬", shop: "各小炒店" },
+    { name: "羊肉汤 + 饼", emoji: "🍲", shop: "羊肉馆" },
+    { name: "酸菜鱼", emoji: "🐟", shop: "川菜馆" }
+  ]
+};
 
-// 生成漂浮食物
+var isPicking = false;
+var rollInterval = null;
+
 (function createFloatingFood() {
-  const emojis = ["🍕","🍔","🍟","🌮","🍣","🍜","🍰","🧁","🍩","🍪","🍉","🍇","🥐","🍗","🍝","🥟","🍚","🍛","🍲","🍖","🥗","🧋","🍦","🍿"];
-  for (let i = 0; i < 20; i++) {
-    const el = document.createElement("span");
+  var emojis = ["🍜","🥘","🍖","🍝","🥟","🫘","🌶️","🍛","🥙","🍲"];
+  for (var i = 0; i < 20; i++) {
+    var el = document.createElement("span");
     el.className = "floating-food";
     el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
     el.style.left = Math.random() * 100 + "%";
@@ -295,59 +364,75 @@ let rollInterval = null;
   }
 })();
 
+function switchMeal(meal) {
+  currentMeal = meal;
+  document.querySelectorAll(".tab").forEach(function(t) { t.classList.remove("active"); });
+  document.getElementById("tab" + meal.charAt(0).toUpperCase() + meal.slice(1)).classList.add("active");
+  var labels = { breakfast: "早饭吃啥", lunch: "午饭吃啥", dinner: "晚饭吃啥" };
+  var icons = { breakfast: "🌅", lunch: "☀️", dinner: "🌙" };
+  document.getElementById("mealLabel").textContent = icons[meal] + " — " + labels[meal] + " —";
+  document.getElementById("foodEmoji").textContent = "🤔";
+  document.getElementById("foodName").textContent = "点击按钮看看吧～";
+  document.getElementById("foodName").className = "placeholder-text";
+  document.getElementById("shopHint").textContent = "";
+  document.getElementById("displayBox").classList.remove("done", "rolling");
+  document.getElementById("countdownOverlay").style.display = "none";
+}
+
 function startPick() {
   if (isPicking) return;
   isPicking = true;
 
-  const pickBtn = document.getElementById("pickBtn");
-  const displayBox = document.getElementById("displayBox");
-  const foodEmoji = document.getElementById("foodEmoji");
-  const foodName = document.getElementById("foodName");
-  const countdownOverlay = document.getElementById("countdownOverlay");
+  var pickBtn = document.getElementById("pickBtn");
+  var displayBox = document.getElementById("displayBox");
+  var foodEmoji = document.getElementById("foodEmoji");
+  var foodName = document.getElementById("foodName");
+  var shopHint = document.getElementById("shopHint");
+  var countdownOverlay = document.getElementById("countdownOverlay");
+  var list = FOODS[currentMeal];
 
   pickBtn.disabled = true;
   displayBox.classList.add("rolling");
   displayBox.classList.remove("done");
   foodName.className = "placeholder-text";
+  shopHint.textContent = "";
   countdownOverlay.style.display = "none";
 
-  // 阶段1: 快速滚动 2 秒
-  const rollSpeed = 60;
-  let rollCount = 0;
-  const rollDuration = 2000;
+  var rollCount = 0;
+  var maxRoll = 2000 / 60;
 
   rollInterval = setInterval(function() {
-    const r = FOODS[Math.floor(Math.random() * FOODS.length)];
+    var r = list[Math.floor(Math.random() * list.length)];
     foodEmoji.textContent = r.emoji;
     foodName.textContent = r.name;
     rollCount++;
-    if (rollCount >= rollDuration / rollSpeed) {
+    if (rollCount >= maxRoll) {
       clearInterval(rollInterval);
       startCountdownWithRoll();
     }
-  }, rollSpeed);
+  }, 60);
 }
 
 function startCountdownWithRoll() {
-  const displayBox = document.getElementById("displayBox");
-  const foodEmoji = document.getElementById("foodEmoji");
-  const foodName = document.getElementById("foodName");
-  const countdownOverlay = document.getElementById("countdownOverlay");
+  var displayBox = document.getElementById("displayBox");
+  var foodEmoji = document.getElementById("foodEmoji");
+  var foodName = document.getElementById("foodName");
+  var countdownOverlay = document.getElementById("countdownOverlay");
+  var list = FOODS[currentMeal];
 
   displayBox.classList.remove("rolling");
   countdownOverlay.style.display = "flex";
 
-  // 阶段2: 内容继续滚动（慢速）+ 倒计时
-  let count = 3;
+  var count = 3;
   countdownOverlay.textContent = count;
 
   rollInterval = setInterval(function() {
-    const r = FOODS[Math.floor(Math.random() * FOODS.length)];
+    var r = list[Math.floor(Math.random() * list.length)];
     foodEmoji.textContent = r.emoji;
     foodName.textContent = r.name;
   }, 180);
 
-  const cdInterval = setInterval(function() {
+  var cdInterval = setInterval(function() {
     count--;
     if (count > 0) {
       countdownOverlay.textContent = count;
@@ -361,15 +446,18 @@ function startCountdownWithRoll() {
 }
 
 function revealResult() {
-  const pickBtn = document.getElementById("pickBtn");
-  const displayBox = document.getElementById("displayBox");
-  const foodEmoji = document.getElementById("foodEmoji");
-  const foodName = document.getElementById("foodName");
+  var pickBtn = document.getElementById("pickBtn");
+  var displayBox = document.getElementById("displayBox");
+  var foodEmoji = document.getElementById("foodEmoji");
+  var foodName = document.getElementById("foodName");
+  var shopHint = document.getElementById("shopHint");
+  var list = FOODS[currentMeal];
 
-  const final = FOODS[Math.floor(Math.random() * FOODS.length)];
+  var final = list[Math.floor(Math.random() * list.length)];
   foodEmoji.textContent = final.emoji;
   foodName.textContent = final.name;
   foodName.className = "food-name-display";
+  shopHint.textContent = final.shop || "";
   displayBox.classList.add("done");
 
   spawnConfetti();
@@ -378,14 +466,14 @@ function revealResult() {
 }
 
 function spawnConfetti() {
-  const emojis = ["🎉","✨","🌟","💫","🎊","🎀","💖","🌸"];
-  const box = document.getElementById("displayBox");
-  const rect = box.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top;
+  var emojis = ["🎉","✨","🌟","💫","🎊","🎀","💖","🌸"];
+  var box = document.getElementById("displayBox");
+  var rect = box.getBoundingClientRect();
+  var cx = rect.left + rect.width / 2;
+  var cy = rect.top;
 
-  for (let i = 0; i < 12; i++) {
-    const el = document.createElement("span");
+  for (var i = 0; i < 12; i++) {
+    var el = document.createElement("span");
     el.className = "confetti";
     el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
     el.style.left = cx + "px";
