@@ -125,7 +125,6 @@ body {
   <iframe
     id="contentFrame"
     src="https://ggbbpp.github.io/fanpaizi/"
-    sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
     loading="eager">
   </iframe>
 </div>
@@ -142,6 +141,26 @@ body {
 function goBack() {
   window.location.href = "index.html";
 }
+
+var lastDate = new Date().toDateString();
+
+function checkMidnight() {
+  var now = new Date();
+  var today = now.toDateString();
+  if (today !== lastDate) {
+    lastDate = today;
+    var iframe = document.getElementById("contentFrame");
+    iframe.src = iframe.src;  // 强制刷新
+  }
+}
+
+// 每 30 秒检查一次是否跨天
+setInterval(checkMidnight, 30000);
+
+// 页面从后台恢复时也检查
+document.addEventListener("visibilitychange", function() {
+  if (!document.hidden) checkMidnight();
+});
 
 document.getElementById("contentFrame").onerror = function() {
   document.getElementById("iframeWrapper").style.display = "none";
@@ -163,3 +182,4 @@ setTimeout(function() {
 
 </body>
 </html>
+
